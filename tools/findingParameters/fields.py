@@ -73,24 +73,25 @@ def displayField(field, y, z) : #field[102][6][6]
 
 
 #Initializes arguments and launch display_impulses function
-def runElecField(file) :
-	#load data
-	# data = rd.readFields(file) #data[12][102][6][6]
-	# print("data length : ", len(data))
-	# print("data[0] length : ", len(data[0]))
-	# print("data[0][0] length : ", len(data[0][0]))
+def runElecField(file, axis=[0], y=3, z=2) :
 
-	sort = 0
-	axis = 0
-	y = 3
-	z = 2
+	sort = 0 #Electric, Magnetic, Current or HalfStep Electric
+
+	# for file in files :
+	# 	#load data
+	# 	data = rd.readFields(file) #data[12][102][6][6]
+	# 	# print("data length : ", len(data))
+	# 	# print("data[0] length : ", len(data[0]))
+	# 	# print("data[0][0] length : ", len(data[0][0]))
+	# 	for ax in axis :
+	# 		field = data[sort*4+ax] #field[102][6][6]
+	# 		displayField(field, y, z)
 
 	amplitude = 4
 	angularFrequence = 5
 	phase = 0
 
-	print("real angular frequence : ", aF)
-	#field = data[sort*4+axis] #field[102][6][6]
+	print("real angular frequence : ", angularFrequence)
 	field = [sinusoidal(i, amplitude, angularFrequence, phase) for i in range(102)]
 
 	displayField(field, y, z)

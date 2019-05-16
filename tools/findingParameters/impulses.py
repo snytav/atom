@@ -73,19 +73,12 @@ def display_impulses(impulses, sort, coordinate, showMean=False, showVariance=Fa
 
 
 #Initializes arguments and launch display_impulses function
-def runImpulse(file) :
-	#get data path
-	dataPath = [file]
+def runImpulse(dataPath, sorts= [False, True, True], axis= [True, False, False]) :
 
 	#Display curves separetely or compare them 
 	separatedFiles = False
 	#Display axis separetely
 	separatedAxis = True
-
-	#Sorts to display
-	sorts = [False, True, True]
-	#Axis to display
-	axis = [True, False, False]
 
 	dataSet = []
 

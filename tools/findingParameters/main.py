@@ -39,26 +39,152 @@ def format(file):
 			print("\t\t\tAxis",axis[j],": ", len(data[i][1][3+j]), "\t(data[",i,"][1][",3+j,"])")
 
 
-
 def main() :
-	#format(file)
-
-	arg = sys.argv[1]
-
-	if (arg == "f") :
-		file = sys.argv[2]	
-		format(file)
-	elif (arg == "i") :
-		file = sys.argv[2]
-		imp.runImpulse(file)
-	elif (arg == "e") :
-		file = sys.argv[2]
-		fld.runElecField(file)
-	else :
-		print("Wrong arguments\n")
+	if (len(sys.argv) == 0) :
+		print("In order to display the format of the loaded file :")
+		print("python3 main.py -format inputFile\n")
 		print("In order to display impulses, type :")
-		print("python3 findParams.py i inputFile\n")
+		print("python3 main.py -i inputFile(s) -s 1 2 3 -a x y z\n")
 		print("In order to display electric field, type :")
-		print("python3 findParams.py e inputFile\n")
+		print("python3 main.py -e inputFile -yz 2 3\n")
+	else :
+		if (sys.argv[1] == "-i") :
+			files = []
+			stringSorts = []
+			stringAxis = []
+			sorts = [False, False, False]
+			axis = [False, False, False]
+			tmp = 2
 
-main()
+			#Getting files path
+			while (sys.argv[tmp][0] != "-") :
+				files += [sys.argv[tmp]]
+				tmp += 1
+
+			#Getting sorts to treat
+			if (sys.argv[tmp] != "-s") :
+				print("Wrong arguments ! (sort)")
+				return(-1)
+			tmp += 1
+			while(sys.argv[tmp][0] != "-") :
+				stringSorts += [sys.argv[tmp]]
+				tmp += 1
+
+			#Getting axis to treat
+			if (sys.argv[tmp] != "-a") :
+				print("Wrong arguments ! (axis)")
+				return(-1)
+			tmp += 1
+			while (tmp < len(sys.argv)) :
+				stringAxis += [sys.argv[tmp]]
+				tmp += 1
+
+			#Converting arguments
+			for s in stringSorts :
+				if (s == "1") :
+					sorts[0] = True
+				elif (s == "2") :
+					sorts[1] = True
+				elif (s == "3") :
+					sorts[2] = True
+				else :
+					print("Wrong arguments ! (sort value)")
+					return(-1)
+
+			for a in stringAxis :
+				if (a == "x") :
+					axis[0] = True
+				elif (a == "y") :
+					axis[1] = True
+				elif (a == "z") :
+					axis[2] = True
+				else :
+					print("Wrong arguments ! (axis value)")
+					return(-1)
+
+			#Launching the impulse display
+			imp.runImpulse(files, sorts, axis)
+
+		elif (sys.argv[1] == "-e") :
+			files = []
+			stringAxis = []
+			axis = []
+			y = 0
+			z = 0
+			tmp = 2
+
+			#Getting files path
+			while (sys.argv[tmp][0] != "-") :
+				files += [sys.argv[tmp]]
+				tmp += 1
+
+			#Getting the coordinates of the field to display
+			if (sys.argv[tmp] != "-a") :
+				print("Wrong arguments ! (axis)")
+				return(-1)
+			tmp += 1
+			while(sys.argv[tmp][0] != "-") :
+				stringAxis += [sys.argv[tmp]]
+				tmp += 1
+
+			#Getting y & z coordinates of the mesh to treat
+			if (sys.argv[tmp] != "-yz") :
+				print("Wrong arguments ! (y or z)")
+				return(-1)
+			tmp += 1
+			y = int(sys.argv[tmp])
+			tmp += 1
+			z = int(sys.argv[tmp])
+
+			#Converting the parameters
+			for a in stringAxis :
+				if (a == "x") :
+					axis+= [0]
+				elif (a == "y") :
+					axis+= [1]
+				elif (a == "z") :
+					axis+= [2]
+				else :
+					print("Wrong arguments ! (axis value)")
+					return(-1)
+
+			print("files",files)
+			print("axis",axis)
+			print("y",y)
+			print("z",z)
+
+			#Launching the electric field display
+			fld.runElecField(files, axis, y, z)
+
+		elif (sys.argv[1] == "-format") :
+			file = sys.argv[2]
+			format(file)
+		else :
+			print("In order to display the format of the loaded file :")
+			print("python3 main.py -format inputFile\n")
+			print("In order to display impulses, type :")
+			print("python3 main.py -i inputFile(s) -s 1 2 3 -a x y z\n")
+			print("In order to display electric field, type :")
+			print("python3 main.py -e inputFile -a -yz 2 3\n")
+	# else :
+	# 	arg = sys.argv[1]
+
+	# 	if (arg == "f") :
+	# 		file = sys.argv[2]	
+	# 		format(file)
+	# 	elif (arg == "i") :
+	# 		file = sys.argv[2]
+	# 		imp.runImpulse(file)
+	# 	elif (arg == "e") :
+	# 		file = sys.argv[2]
+	# 		fld.runElecField(file)
+	# 	else :
+	# 		print("Wrong arguments\n")
+	# 		print("In order to display the format of the loaded file :")
+	# 		print("python3 main.py f inputFile\n")
+	# 		print("In order to display impulses, type :")
+	# 		print("python3 main.py i inputFile\n")
+	# 		print("In order to display electric field, type :")
+	# 		print("python3 main.py e inputFile\n")
+
+main() 
