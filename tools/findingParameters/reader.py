@@ -216,7 +216,7 @@ def readAllFileDAT(nameFile):
 
 		#tab = [E[3],M[3],C[3],E2[3]]
 		#(part, tabPart) = ((Ft, nbP, chrg, mass, Ft), (parts[coord[3], impulse[3]]), ...)
-		return (tab,(part1,tabPart1),(part2,tabPart2),(part3,tabPart3))
+		return [tab,[part1,tabPart1],[part2,tabPart2],[part3,tabPart3]]
 
 #Read a dat file
 #Returns (tab,(part1,tabPart1),(part2,tabPart2),(part3,tabPart3))
@@ -280,7 +280,7 @@ def readFields(nameFile) :
 	if (nameFile[-3:] == "dat") :
 		output = readFieldsDAT(nameFile)
 	elif (nameFile[-2:] == "nc") :
-		output = readFieldsCDF(nameFile, readSort, readAxis)
+		output = readFieldsCDF(nameFile)
 	else :
 		print("Wrong file format !")
 	return output
@@ -294,10 +294,9 @@ def readFieldsCDF(nameFile) :
 	axis = ["x", "y", "z"]
 
 	for i in range(4) :
-		fields += [[]]
 		for j in range(3) :
 			tmp = fieldsName[i] + axis[j] 
-			fields[i] += [ma.getdata(data.variables[tmp])]
+			fields += [ma.getdata(data.variables[tmp])]
 
 	return fields
 

@@ -40,13 +40,8 @@ def format(file):
 
 
 def main() :
-	if (len(sys.argv) == 0) :
-		print("In order to display the format of the loaded file :")
-		print("python3 main.py -format inputFile\n")
-		print("In order to display impulses, type :")
-		print("python3 main.py -i inputFile(s) -s 1 2 3 -a x y z\n")
-		print("In order to display electric field, type :")
-		print("python3 main.py -e inputFile -yz 2 3\n")
+	if (len(sys.argv) == 1) :
+		print("To display help, type :\npython3 main.py -h")
 	else :
 		if (sys.argv[1] == "-i") :
 			files = []
@@ -159,32 +154,14 @@ def main() :
 		elif (sys.argv[1] == "-format") :
 			file = sys.argv[2]
 			format(file)
-		else :
+		elif (sys.argv[1] == "-h") :
 			print("In order to display the format of the loaded file :")
 			print("python3 main.py -format inputFile\n")
 			print("In order to display impulses, type :")
 			print("python3 main.py -i inputFile(s) -s 1 2 3 -a x y z\n")
 			print("In order to display electric field, type :")
 			print("python3 main.py -e inputFile -a -yz 2 3\n")
-	# else :
-	# 	arg = sys.argv[1]
-
-	# 	if (arg == "f") :
-	# 		file = sys.argv[2]	
-	# 		format(file)
-	# 	elif (arg == "i") :
-	# 		file = sys.argv[2]
-	# 		imp.runImpulse(file)
-	# 	elif (arg == "e") :
-	# 		file = sys.argv[2]
-	# 		fld.runElecField(file)
-	# 	else :
-	# 		print("Wrong arguments\n")
-	# 		print("In order to display the format of the loaded file :")
-	# 		print("python3 main.py f inputFile\n")
-	# 		print("In order to display impulses, type :")
-	# 		print("python3 main.py i inputFile\n")
-	# 		print("In order to display electric field, type :")
-	# 		print("python3 main.py e inputFile\n")
+		else :
+			print("Wrong arguments !")
 
 main() 

@@ -17,7 +17,7 @@ def findSinFunction(field) :
 
 	#DETERMINING ANGULAR FREQUENCE
 	AmplHistory = [[], []] #[[Positions], [Values]] of the points close to the amplitude
-	amplAdmitance = 0.9*amplitude #How close a point should be to be considered as amplitude
+	amplAdmitance = 0.8*amplitude #How close a point should be to be considered as amplitude
 
 	print("field : ", len(field))
 
@@ -56,8 +56,7 @@ def sinusoidal(x, amplitude, angularFreq, phase) :
 #Displays the value of the Electric field following x axis
 def displayField(field, y, z) : #field[102][6][6]
 	abscissa = np.arange(0, len(field), 1)
-	# axis = [] + [field[i][y][z] for i in range(len(field))] #Convert matrix[x][y][z] to list[102]
-	axis = [] + field 
+	axis = [] + [field[i][y][z] for i in range(len(field))] #Convert matrix[x][y][z] to list[102]
 
 	plt.plot(abscissa, axis, markersize=0.2, color='red')
 
@@ -73,28 +72,16 @@ def displayField(field, y, z) : #field[102][6][6]
 
 
 #Initializes arguments and launch display_impulses function
-def runElecField(file, axis=[0], y=3, z=2) :
+def runElecField(files, axis=[0], y=3, z=2) :
 
 	sort = 0 #Electric, Magnetic, Current or HalfStep Electric
 
-	# for file in files :
-	# 	#load data
-	# 	data = rd.readFields(file) #data[12][102][6][6]
-	# 	# print("data length : ", len(data))
-	# 	# print("data[0] length : ", len(data[0]))
-	# 	# print("data[0][0] length : ", len(data[0][0]))
-	# 	for ax in axis :
-	# 		field = data[sort*4+ax] #field[102][6][6]
-	# 		displayField(field, y, z)
-
-	amplitude = 4
-	angularFrequence = 5
-	phase = 0
-
-	print("real angular frequence : ", angularFrequence)
-	field = [sinusoidal(i, amplitude, angularFrequence, phase) for i in range(102)]
-
-	displayField(field, y, z)
+	for file in files :
+		#load data
+		data = rd.readFields(file) #data[12][102][6][6]
+		for ax in axis :
+			field = data[sort*4+ax] #field[102][6][6]
+			displayField(field, y, z)
 
 	plt.xlabel('Position')
 	plt.ylabel('Electric Field x')
