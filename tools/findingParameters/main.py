@@ -43,7 +43,7 @@ def main() :
 	if (len(sys.argv) == 1) :
 		print("To display help, type :\npython3 main.py -h")
 	else :
-		if (sys.argv[1] == "-i") :
+		if (sys.argv[1] == "-i") : #IMPULSES
 			files = []
 			stringSorts = []
 			stringAxis = []
@@ -100,7 +100,7 @@ def main() :
 			#Launching the impulse display
 			imp.runImpulse(files, sorts, axis)
 
-		elif (sys.argv[1] == "-e") :
+		elif (sys.argv[1] == "-e") : #ELECTRIC FIELD
 			files = []
 			stringAxis = []
 			axis = []
@@ -151,10 +151,10 @@ def main() :
 			#Launching the electric field display
 			fld.runElecField(files, axis, y, z)
 
-		elif (sys.argv[1] == "-format") :
+		elif (sys.argv[1] == "-format") : #DATA FORMAT
 			file = sys.argv[2]
 			format(file)
-		elif (sys.argv[1] == "-h") :
+		elif (sys.argv[1] == "-h") : #HELP
 			print("In order to display the format of the loaded file :")
 			print("python3 main.py -format inputFile\n")
 			print("In order to display impulses, type :")

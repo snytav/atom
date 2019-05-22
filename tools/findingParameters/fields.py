@@ -11,42 +11,35 @@ import reader as rd
 import impulses as imp
 
 def findSinFunction(field) :
+	#DETERMINIG AMPLITUDE
 	amplitude = max(np.abs(field))
-	angularFreq = 1
-	phase = 0
 
-	#DETERMINING ANGULAR FREQUENCE
-	AmplHistory = [[], []] #[[Positions], [Values]] of the points close to the amplitude
-	amplAdmitance = 0.8*amplitude #How close a point should be to be considered as amplitude
 
-	print("field : ", len(field))
+	#DETERMINIG ANGULAR FREQUENCY
+	# computing fourier transform
+	fourier = np.fft.fft(field)
 
-	for i in range(len(field)) :
-		if (np.abs(field[i]) > amplAdmitance) :
-			AmplHistory[0] += [i]
-			AmplHistory[1] += [field[i]]
+	# computing frequencies fourier transform
+	freq = np.fft.fftfreq(len(field))
 
-	#print("AmplHistory : ", AmplHistory)
+	#Getting real part of Fourrier transformed field
+	realFourrier = np.real(fourier)
 
-	halfSymbolGap = [(AmplHistory[0][i+1]-AmplHistory[0][i]) for i in range(len(AmplHistory[0]) - 1)]
+	#Searching for the fundamental frequency
+	tmpAF = max(realFourrier)
+	frequence = 0
+	for i in range(len(realFourrier)) :
+		if (realFourrier[i] > 0.9*tmpAF) :
+			if (freq[i] > 0) :
+				frequence = freq[i]
 
-	print("halfSymbolGap : ", halfSymbolGap)
-	print("halfSymbolGap mean : ", statistics.mean(halfSymbolGap))
+	angularFrequence = frequence*2*np.pi
 
-	cleanGap = []
-	m = statistics.mean(halfSymbolGap)
-	for i in range(len(halfSymbolGap)) :
-		if (halfSymbolGap[i] > m) :
-			cleanGap += [halfSymbolGap[i]]
-
-	print("cleanGap : ", cleanGap)
-	print("cleanGap mean : ", statistics.mean(cleanGap))
-
-	angularFreq = np.pi/statistics.mean(cleanGap)
 
 	#DETERMINING PHASE
+	phase = 0
 
-	return (amplitude, angularFreq, phase)
+	return (amplitude, angularFrequence, phase)
 
 
 def sinusoidal(x, amplitude, angularFreq, phase) :
