@@ -79,3 +79,36 @@ def runElecField(files, axis=[0], y=3, z=2) :
 	plt.xlabel('Position')
 	plt.ylabel('Electric Field x')
 	plt.show()
+
+
+#field = [Ex, Ey, Ez] with Ex = [102][6][6]
+#Return sum((Ex, Ey, Ez)^2)
+def epsylon(field) :
+	[Ex, Ey, Ez] = field
+	sum = 0
+	for ix in range(len(Ex)) :
+		for iy in range(len(Ex[0])) :
+			for iz in range(len(Ex[0][0])) :
+				sum += Ex[ix][iy][iz]**2 + Ey[ix][iy][iz]**2 + Ez[ix][iy][iz]**2
+
+	return sum
+
+
+def displayEspylon(epsylons) :
+	plt.plot(np.arange(len(epsylons)), epsylons, markersize=0.1)
+
+
+def runEpsylon(files) :
+	epsylons = []
+	for file in files :
+		#load data
+		electricField = rd.readElec(file)
+		epsylons += [epsylon(electricField)]
+
+	print("Epsylon :", epsylons)
+
+	displayEspylon(epsylons)
+
+	plt.xlabel('Epsylon')
+	plt.ylabel('Time')
+	plt.show()

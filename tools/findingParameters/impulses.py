@@ -26,7 +26,7 @@ def categorize(impulses, size, minim, delta) :
 #displays the impulses by categories of width delta
 #particle sorts : 0, 1 or 2
 #coordinate : x=1, y=2, z=3
-def display_impulses(impulses, sort, coordinate, showMean=False, showVariance=False, showCurve=False, delta=0.0001, color=0) :
+def display_impulses(impulses, sort, coordinate, dataPath, showMean=False, showVariance=False, showCurve=False, delta=0.0001, color=0) :
 	#Getting bounds of Impulses
 	minim = min(impulses)
 	maxim = max(impulses)
@@ -54,8 +54,8 @@ def display_impulses(impulses, sort, coordinate, showMean=False, showVariance=Fa
 
 	#Displays Mean
 	if (showMean) :
-		plt.axvline(x = mean, color=curvCol[sort][0], markersize=0.1)
-		plt.text(x = mean, y=0.75*amplitude, s="m:"+str(mean), verticalalignment='center', color=curvCol[sort][0])
+		plt.axvline(x = mean, markersize=0.1)#, color=curvCol[sort][0])
+		plt.text(x = mean, y=0.75*amplitude, s="m:"+str(mean), verticalalignment='center')#, color=curvCol[sort][0])
 
 	#Show Variance
 	variance = statistics.variance(impulses) #compute variance
@@ -63,15 +63,17 @@ def display_impulses(impulses, sort, coordinate, showMean=False, showVariance=Fa
 	
 	#Displays Variance
 	if (showVariance) :
-		plt.text(x = mean, y=0.7*amplitude, s="v:"+str(variance), verticalalignment='center', color=curvCol[sort][0])
+		plt.text(x = mean, y=0.7*amplitude, s="v:"+str(variance), verticalalignment='center')#, color=curvCol[sort][0])
 
 	#Display the Impulses classified by categories
-	plt.plot(velocity, categories, 'ro', markersize=0.2, color=curvCol[sort][0])
+	label = dataPath + " : sort " + str(sort+1) + " - axis " + str(coordinate+1) 
+	plt.plot(velocity, categories, 'ro', markersize=0.2, label="")#, color=curvCol[sort][0])
 
 	#Display the function followed by the impulses
 	if (showCurve) :
 		fImpulses = norm(velocity, amplitude, mean, variance)
-		plt.plot(velocity, fImpulses, markersize=0.1, color=curvCol[sort][1])
+		plt.plot(velocity, fImpulses, markersize=0.1, label=label)#, color=curvCol[sort][1])
+		plt.legend()
 
 
 #Initializes arguments and launch display_impulses function
@@ -103,7 +105,7 @@ def runImpulse(dataPath, sorts= [False, True, True], axis= [True, False, False])
 						for ds in range(len(dataSet)) :
 							print(dataPath[ds])
 							impulsesSortAxis = dataSet[ds][sort+1][1][2 + (ax+1)]
-							display_impulses(impulsesSortAxis, sort, (ax+1), showCurve=True, color=ds)
+							display_impulses(impulsesSortAxis, sort, (ax+1), dataPath[ds], showCurve=True, color=ds)
 	else :
 		for dp in dataPath :
 			#load data

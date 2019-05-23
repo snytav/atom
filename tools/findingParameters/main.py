@@ -151,6 +151,11 @@ def main() :
 			#Launching the electric field display
 			fld.runElecField(files, axis, y, z)
 
+		elif (sys.argv[1] == "-epsylon") :
+			files = []
+			for i in range(2, len(sys.argv)) :
+				files += [sys.argv[i]]
+			fld.runEpsylon(files)
 		elif (sys.argv[1] == "-format") : #DATA FORMAT
 			file = sys.argv[2]
 			format(file)
@@ -158,9 +163,11 @@ def main() :
 			print("In order to display the format of the loaded file :")
 			print("python3 main.py -format inputFile\n")
 			print("In order to display impulses, type :")
-			print("python3 main.py -i inputFile(s) -s 1 2 3 -a x y z\n")
+			print("python3 main.py -i inputFile(s) -s 2 3 -a x\n")
 			print("In order to display electric field, type :")
-			print("python3 main.py -e inputFile -a -yz 2 3\n")
+			print("python3 main.py -e inputFile -a x -yz 2 3\n")
+			print("In order to calculate electric field energy, type :")
+			print("python3 main.py -epsylon inputFile(s) \n")
 		else :
 			print("Wrong arguments !")
 

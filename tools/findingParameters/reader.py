@@ -117,7 +117,7 @@ def readPartFileCDF(nameFile, readSort, readAxis) :
 def readAllFileDAT(nameFile):
 
 	print("File : \"", nameFile, "\"")
-	print("Reading ...\n")
+	print("Reading ...")
 
 	try:
 		f = open(nameFile, "rb") #read binary
@@ -212,7 +212,7 @@ def readAllFileDAT(nameFile):
 
 	finally:
 		f.close()
-		print("OK")
+		print("OK\n")
 
 		#tab = [E[3],M[3],C[3],E2[3]]
 		#(part, tabPart) = ((Ft, nbP, chrg, mass, Ft), (parts[coord[3], impulse[3]]), ...)
@@ -224,7 +224,7 @@ def readAllFileDAT(nameFile):
 def readPartFileDAT(nameFile, readSort, readAxis):
 
 	print("File : \"", nameFile, "\"")
-	print("Reading ...\n")
+	print("Reading ...")
 
 	try:
 		f = open(nameFile, "rb") #read binary
@@ -247,21 +247,24 @@ def readPartFileDAT(nameFile, readSort, readAxis):
 		tabParts = [[], [], []]
 		structs = [[], [], []]
 		for sort in range(len(readSort)) :
-			print()
 			print("Sort number ", sort+1)
 			r = f.read(32)
 			parts[sort] = struct.unpack("<ldddl",r)
 			size = int(parts[sort][1])
 			print("Size : ",size)
-			tabParts[sort] = np.zeros((6,size),dtype = 'd')
-			form = createFormatInt8(size)
-			for x in range(0, 6) :
-				r = f.read(size*8+8)
-				structs[sort] = struct.unpack(form, r)
-				tmp = 1
-				for i in range(0, size) :
-					tabParts[sort][x][i] = structs[sort][tmp]
-					tmp+=1 
+			if (readSort[sort]) :
+				tabParts[sort] = np.zeros((6,size),dtype = 'd')
+				form = createFormatInt8(size)
+				for x in range(0, 6) :
+					r = f.read(size*8+8)
+					structs[sort] = struct.unpack(form, r)
+					tmp = 1
+					for i in range(0, size) :
+						tabParts[sort][x][i] = structs[sort][tmp]
+						tmp+=1 
+			else :
+				f.read(6*(size*8+8))
+				print("Skip sort")
 			print("OK")
 
 	except IOError:
@@ -269,11 +272,65 @@ def readPartFileDAT(nameFile, readSort, readAxis):
 
 	finally:
 		f.close()
-		print("OK")
+		print("OK\n")
 		#tab = [E[3],M[3],C[3],E2[3]]
 		#(part, tabPart) = ((Ft, nbP, chrg, mass, Ft), (parts[coord[3], impulse[3]]), ...)
 
 		return [tab, [parts[0], tabParts[0]], [parts[1], tabParts[1]], [parts[2], tabParts[2]]]
+
+def readElec(nameFile) :
+	output = []
+	if (nameFile[-3:] == "dat") :
+		output = readElecDAT(nameFile)
+	elif (nameFile[-2:] == "nc") :
+		output = readElecCDF(nameFile)
+	else :
+		print("Wrong file format !")
+	return output
+
+def readElecDAT(nameFile) :
+	print("File : \"", nameFile, "\"")
+	print("Reading ...")
+
+	try:
+		f = open(nameFile, "rb") #read binary
+		tab = np.zeros((3,102,6,6),dtype='d')
+		form = createFormatInt8(3672) # "<ld...dl"
+
+		for x in range(0,3):
+			#r receive dat string (binary ?)
+			r = f.read(29384)
+			#v recoit python string
+			v = struct.unpack(form, r)
+			tmp = 1
+			for i in range(0,102):
+				for j in range(0,6):
+					for k in range(0,6):
+						tab[x][i][j][k] = v[tmp]
+						tmp+=1
+	except IOError:
+		print("Error")
+
+	finally:
+		f.close()
+		print("OK\n")
+
+		#tab = [Ex[102][6][6],Ey[102][6][6],Ez[102][6][6]]
+		return tab
+
+def readElecCDF(nameFile) :
+	data = Dataset(nameFile, "r", format="NETCDF4")
+
+	fields = []
+
+	fieldsName = ["E", "M", "J", "Q"]
+	axis = ["x", "y", "z"]
+
+	for i in range(3) :
+		tmp = fieldsName[0] + axis[i] 
+		fields += [ma.getdata(data.variables[tmp])]
+
+	return fields
 
 def readFields(nameFile) :
 	output = []
