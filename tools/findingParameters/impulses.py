@@ -50,29 +50,29 @@ def display_impulses(impulses, sort, coordinate, dataPath, showMean=False, showV
 
 	#Show Mean
 	mean = statistics.mean(impulses) #compute the mean
-	print("Mean for Sort " + str(sort+1) + " - " + axis[coordinate-1] + " axis : " + str(mean)) #print the mean
+	print("Mean for Sort " + str(sort+1) + " - " + axis[coordinate-1] + " axis : " + str(mean)) #print mean
 
 	#Displays Mean
 	if (showMean) :
-		plt.axvline(x = mean, markersize=0.1)#, color=curvCol[sort][0])
-		plt.text(x = mean, y=0.75*amplitude, s="m:"+str(mean), verticalalignment='center')#, color=curvCol[sort][0])
+		plt.axvline(x = mean, markersize=0.1, color=curvCol[sort][0])
+		plt.text(x = mean, y=0.75*amplitude, s="m:"+str(mean), verticalalignment='center', color=curvCol[color%len(curvCol)][1])
 
 	#Show Variance
 	variance = statistics.variance(impulses) #compute variance
-	print("Variance for Sort " + str(sort+1) + " - " + axis[coordinate-1] + " axis : " + str(variance)) #print 
+	print("Variance for Sort " + str(sort+1) + " - " + axis[coordinate-1] + " axis : " + str(variance)) #print variance 
 	
 	#Displays Variance
 	if (showVariance) :
-		plt.text(x = mean, y=0.7*amplitude, s="v:"+str(variance), verticalalignment='center')#, color=curvCol[sort][0])
+		plt.text(x = mean, y=0.7*amplitude, s="v:"+str(variance), verticalalignment='center', color=curvCol[color%len(curvCol)][1])
 
 	#Display the Impulses classified by categories
 	label = dataPath + " : sort " + str(sort+1) + " - axis " + str(coordinate+1) 
-	plt.plot(velocity, categories, 'ro', markersize=0.2, label="")#, color=curvCol[sort][0])
+	plt.plot(velocity, categories, 'ro', markersize=0.2, label="", color=curvCol[color%len(curvCol)][1])
 
 	#Display the function followed by the impulses
 	if (showCurve) :
 		fImpulses = norm(velocity, amplitude, mean, variance)
-		plt.plot(velocity, fImpulses, markersize=0.1, label=label)#, color=curvCol[sort][1])
+		plt.plot(velocity, fImpulses, markersize=0.1, label=label, color=curvCol[color%len(curvCol)][0])
 		plt.legend()
 
 
