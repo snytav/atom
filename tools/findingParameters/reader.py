@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import struct
 import numpy.ma as ma
+import os
 
 #return "<ld...(size)...dl"
 def createFormatInt8(size):
@@ -11,6 +12,30 @@ def createFormatInt8(size):
 		form += "d"
 	form += "l"
 	return form
+
+#openning repertories
+def openRep(files) :
+	for i in range(len(files)) :
+		if ((files[i][-3:] != "dat") and (files[i][-2] != "nc")) : #if it's a repertory
+
+			#adding / if necessary
+			tmp = files[i]
+			if (files[i][-1] != "/") : 
+				tmp += "/"
+
+			#storing all the paths of the repertory
+			tmpFiles = []
+			for path in os.listdir(files[i]) :
+				if ((path[-3:] == "dat") or (path[-2:] == "nc")) :
+					tmpFiles += [tmp + path]
+
+			#including all the files of the repertory
+			files = files[:i] + tmpFiles + files[i+1:]
+	
+	return files
+
+
+#DISPLAY IMPULSES
 
 def readFile(nameFile, readSort = [], readAxis = []) :
 	output = []
@@ -278,6 +303,10 @@ def readPartFileDAT(nameFile, readSort, readAxis):
 
 		return [tab, [parts[0], tabParts[0]], [parts[1], tabParts[1]], [parts[2], tabParts[2]]]
 
+
+
+#DISPLAY FIELD
+
 def readElec(nameFile) :
 	output = []
 	if (nameFile[-3:] == "dat") :
@@ -332,6 +361,10 @@ def readElecCDF(nameFile) :
 
 	return fields
 
+
+#EPSYLON
+
+#Launch a reader depending on the file format
 def readFields(nameFile) :
 	output = []
 	if (nameFile[-3:] == "dat") :
@@ -342,6 +375,7 @@ def readFields(nameFile) :
 		print("Wrong file format !")
 	return output
 
+#Returns All fields values
 def readFieldsCDF(nameFile) :
 	data = Dataset(nameFile, "r", format="NETCDF4")
 
@@ -357,6 +391,7 @@ def readFieldsCDF(nameFile) :
 
 	return fields
 
+#Returns all field values
 def readFieldsDAT(nameFile) :
 	print("File : \"", nameFile, "\"")
 	print("Reading ...\n")

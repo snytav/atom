@@ -51,10 +51,13 @@ def main() :
 			axis = [False, False, False]
 			tmp = 2
 
-			#Getting files path
+			# #Getting files path
 			while (sys.argv[tmp][0] != "-") :
 				files += [sys.argv[tmp]]
 				tmp += 1
+
+			#openning repositories
+			files = rd.openRep(files)
 
 			#Getting sorts to treat
 			if (sys.argv[tmp] != "-s") :
@@ -108,10 +111,13 @@ def main() :
 			z = 0
 			tmp = 2
 
-			#Getting files path
+			# #Getting files path
 			while (sys.argv[tmp][0] != "-") :
 				files += [sys.argv[tmp]]
 				tmp += 1
+
+			#openning repositories
+			files = rd.openRep(files)
 
 			#Getting the coordinates of the field to display
 			if (sys.argv[tmp] != "-a") :
@@ -153,8 +159,13 @@ def main() :
 
 		elif (sys.argv[1] == "-epsylon") :
 			files = []
-			for i in range(2, len(sys.argv)) :
-				files += [sys.argv[i]]
+			for tmp in range(2, len(sys.argv)) :
+				files += [sys.argv[tmp]] 
+				tmp += 1
+
+			#openning repositories
+			files = rd.openRep(files)
+			
 			fld.runEpsylon(files)
 		elif (sys.argv[1] == "-format") : #DATA FORMAT
 			file = sys.argv[2]

@@ -61,7 +61,7 @@ def displayField(field, y, z) : #field[102][6][6]
 	#Applying the function to compare with the data
 	fSin = sinusoidal(abscissa, amplitude, angularFreq, phase)
 
-	plt.plot(abscissa, fSin, markersize=0.1, color='green')
+	#plt.plot(abscissa, fSin, markersize=0.1, color='green')
 
 
 #Initializes arguments and launch display_impulses function
@@ -70,6 +70,7 @@ def runElecField(files, axis=[0], y=3, z=2) :
 	sort = 0 #Electric, Magnetic, Current or HalfStep Electric
 
 	for file in files :
+		plt.figure()
 		#load data
 		data = rd.readFields(file) #data[12][102][6][6]
 		for ax in axis :
@@ -109,6 +110,6 @@ def runEpsylon(files) :
 
 	displayEspylon(epsylons)
 
-	plt.xlabel('Epsylon')
-	plt.ylabel('Time')
+	plt.xlabel('Time')
+	plt.ylabel('Epsylon')
 	plt.show()
