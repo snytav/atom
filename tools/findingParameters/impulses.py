@@ -1,11 +1,7 @@
-from netCDF4 import Dataset
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 import statistics
-import sys
-import struct
-import netCDF4
 import numpy.ma as ma
 import reader as rd
 
@@ -89,8 +85,7 @@ def runImpulse(dataPath, sorts= [False, True, True], axis= [True, False, False])
 	if (separatedAxis) :
 		#load all dataSets
 		for dp in range(len(dataPath)) :
-			dataSet += [rd.readFile(dataPath[dp], sorts, axis)]
-			#dataSet += [rd.readAllFile(dataPath[dp])]
+			dataSet += [rd.readImpulses(dataPath[dp], sorts, axis)]
 
 		#display each axis selected
 		for ax in range(len(axis)) :
@@ -109,7 +104,7 @@ def runImpulse(dataPath, sorts= [False, True, True], axis= [True, False, False])
 	else :
 		for dp in dataPath :
 			#load data
-			dataSet = rd.readFile(dp)
+			dataSet = rd.readImpulses(dp)
 
 			if (separatedFiles) :
 				plt.figure("Sort - Axis")

@@ -1,15 +1,18 @@
-from netCDF4 import Dataset
+#from netCDF4 import Dataset
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
-import statistics
+#import statistics
 import sys
-import struct
-import netCDF4
+#import struct
+#import netCDF4
+
 import numpy.ma as ma
 import reader as rd
 import impulses as imp
 import fields as fld
+import epsylon as eps
+import phasePlanD as ppd
 
 #Displays the format of the data from readFile
 def format(file):
@@ -161,15 +164,35 @@ def main() :
 			files = []
 			for tmp in range(2, len(sys.argv)) :
 				files += [sys.argv[tmp]] 
-				tmp += 1
 
 			#openning repositories
 			files = rd.openRep(files)
 			
-			fld.runEpsylon(files)
+			eps.runEpsylon(files)
+
+		elif (sys.argv[1] == "-ppd") :#PHASE PLANE DIAGRAMS
+			files = []
+			nbBatchs = 100
+			tmp = 2
+			while (tmp<len(sys.argv) and sys.argv[tmp] != "-nb") :
+				files += [sys.argv[tmp]] 
+				tmp += 1
+
+			#openning repositories
+			files = rd.openRep(files)
+
+			if (tmp<len(sys.argv) and sys.argv[tmp] == "-nb") :
+				tmp += 1
+				nbBatchs = sys.argv[tmp]
+			else :
+				print("Wrong arguments !")
+
+			ppd.runPhasePlan(files, nbBatchs)
+
 		elif (sys.argv[1] == "-format") : #DATA FORMAT
 			file = sys.argv[2]
 			format(file)
+		
 		elif (sys.argv[1] == "-h") : #HELP
 			print("In order to display the format of the loaded file :")
 			print("python3 main.py -format inputFile\n")
@@ -179,7 +202,8 @@ def main() :
 			print("python3 main.py -e inputFile -a x -yz 2 3\n")
 			print("In order to calculate electric field energy, type :")
 			print("python3 main.py -epsylon inputFile(s) \n")
+		
 		else :
 			print("Wrong arguments !")
 
-main() 
+main()

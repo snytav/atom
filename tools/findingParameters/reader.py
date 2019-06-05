@@ -5,7 +5,7 @@ import struct
 import numpy.ma as ma
 import os
 
-#return "<ld...(size)...dl"
+#returns "<ldd...(size)...ddl"
 def createFormatInt8(size):
 	form = "<l"
 	for h in range(0,size):
@@ -13,10 +13,12 @@ def createFormatInt8(size):
 	form += "l"
 	return form
 
-#openning repertories
+#Openning repertories from repPath
 def openRep(files) :
 	for i in range(len(files)) :
 		if ((files[i][-3:] != "dat") and (files[i][-2] != "nc")) : #if it's a repertory
+			print(files[i][-3:])
+			print(files[i][-2:])
 
 			#adding / if necessary
 			tmp = files[i]
@@ -37,7 +39,19 @@ def openRep(files) :
 
 #DISPLAY IMPULSES
 
-def readFile(nameFile, readSort = [], readAxis = []) :
+def readFile(nameFile) :
+	output = []
+	if (nameFile[-3:] == "dat") :
+		output = readAllFileDAT(nameFile)
+	elif (nameFile[-2:] == "nc") :
+		output = readAllFileCDF(nameFile)
+	else :
+		print("Wrong file format !")
+	return output
+
+
+#readSort/readAxis = [True/False, True/False, True/False] or []
+def readImpulses(nameFile, readSort = [], readAxis = []) :
 	output = []
 	if (nameFile[-3:] == "dat") :
 		if (readSort == []) :
@@ -53,8 +67,10 @@ def readFile(nameFile, readSort = [], readAxis = []) :
 		print("Wrong file format !")
 	return output
 
-#tab = [E[3],M[3],C[3],E2[3]]
-#(part, tabPart) = ((Ft, nbP, chrg, mass, Ft), (coord_impulses[coord[3], impulse[3]]), ...)
+
+#returns [fields, [props[0], coor_impulses[0]], [props[1], coor_impulses[1]], [props[2], coor_impulses[2]]]
+#fields = [E[x][y][z], M[x][y][z], C[x][y][z], E2[x][y][z]]
+#[props, coor_impulses] = [[ Ft, nbP, chrg, mass, Ft], [coorx, coory, coorz, impx, impy, impz]] ], ...]
 def readAllFileCDF(nameFile) :
 	data = Dataset(nameFile, "r", format="NETCDF4")
 
@@ -98,8 +114,9 @@ def readAllFileCDF(nameFile) :
 
 	return [fields, [props[0], coor_impulses[0]], [props[1], coor_impulses[1]], [props[2], coor_impulses[2]]]
 
-#tab = [E[3],M[3],C[3],E2[3]]
-#(props, coor_impulses) = ((Ft, nbP, chrg, mass, Ft), (coor_impulses[coord[3], impulse[3]]), ...)
+
+#returns [[], [props[0], coor_impulses[0]], [props[1], coor_impulses[1]], [props[2], coor_impulses[2]]]
+#[props, coor_impulses] = [[ Ft, nbP, chrg, mass, Ft], [coorx, coory, coorz, impx, impy, impz]] ], ...]
 def readPartFileCDF(nameFile, readSort, readAxis) :
 	data = Dataset(nameFile, "r", format="NETCDF4")
 
@@ -136,9 +153,9 @@ def readPartFileCDF(nameFile, readSort, readAxis) :
 	return [[], [props[0], coor_impulses[0]], [props[1], coor_impulses[1]], [props[2], coor_impulses[2]]]
 
 
-#Read a dat file
-#Returns (tab,(part1,tabPart1),(part2,tabPart2),(part3,tabPart3))
-#tab 
+#returns [fields, [props[0], coor_impulses[0]], [props[1], coor_impulses[1]], [props[2], coor_impulses[2]]]
+#fields = [E[x][y][z], M[x][y][z], C[x][y][z], E2[x][y][z]]
+#[props, coor_impulses] = [[ Ft, nbP, chrg, mass, Ft], [coorx, coory, coorz, impx, impy, impz]] ], ...]
 def readAllFileDAT(nameFile):
 
 	print("File : \"", nameFile, "\"")
@@ -240,12 +257,13 @@ def readAllFileDAT(nameFile):
 		print("OK\n")
 
 		#tab = [E[3],M[3],C[3],E2[3]]
-		#(part, tabPart) = ((Ft, nbP, chrg, mass, Ft), (parts[coord[3], impulse[3]]), ...)
+		#(part, tabPart) = ((Ft, nbP, chrg, mass, Ft), (parts[coorx, coory, coorz, impx, impy, impz]]), ...)
 		return [tab,[part1,tabPart1],[part2,tabPart2],[part3,tabPart3]]
 
-#Read a dat file
-#Returns (tab,(part1,tabPart1),(part2,tabPart2),(part3,tabPart3))
-#tab 
+
+#returns [fields, [props[0], coor_impulses[0]], [props[1], coor_impulses[1]], [props[2], coor_impulses[2]]]
+#fields = [E[x][y][z], M[x][y][z], C[x][y][z], E2[x][y][z]]
+#[props, coor_impulses] = [[ Ft, nbP, chrg, mass, Ft], [coorx, coory, coorz, impx, impy, impz]] ], ...]
 def readPartFileDAT(nameFile, readSort, readAxis):
 
 	print("File : \"", nameFile, "\"")
@@ -299,7 +317,7 @@ def readPartFileDAT(nameFile, readSort, readAxis):
 		f.close()
 		print("OK\n")
 		#tab = [E[3],M[3],C[3],E2[3]]
-		#(part, tabPart) = ((Ft, nbP, chrg, mass, Ft), (parts[coord[3], impulse[3]]), ...)
+		#(part, tabPart) = ((Ft, nbP, chrg, mass, Ft), (parts[coorx, coory, coorz, impx, impy, impz]]), ...)
 
 		return [tab, [parts[0], tabParts[0]], [parts[1], tabParts[1]], [parts[2], tabParts[2]]]
 
