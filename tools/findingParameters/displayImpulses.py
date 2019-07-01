@@ -2,14 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import statistics as st
-
-
-import PyGnuplot as gp
 import reader as rd
 
-def displayParticles1D(coordinates, impulses, sort, coordinate, dataPath, color=0) :
-	#Colors of the curve
-	curvCol = [['red', '#e136ec'], ['blue', '#36b9ec'], ['green', '#86ec36']]
+
+#Display the impulse of each particles for each sorts
+def displayParticles1D(coordinates, impulses, sort, coordinate, dataPath) :
 	axis = ['x', 'y', 'z']
 
 	#Initialise pyplot figure
@@ -21,10 +18,11 @@ def displayParticles1D(coordinates, impulses, sort, coordinate, dataPath, color=
 	plt.xlabel(xlabel)
 
 	#Drawing the value of the impulse for each particle
-	plt.plot(coordinates, impulses, 'ro', markersize=0.2, label="", color=curvCol[color%len(curvCol)][1])
+	plt.plot(coordinates, impulses, 'ro', markersize=0.2)
 
-def displayNodes1D(coordinates, impulses, sort, coordinate, dataPath, color = 0) :
-	curvCol = [['red', '#e136ec'], ['blue', '#36b9ec'], ['green', '#86ec36']]
+
+#Calculates & Displays the impulse of each node following one axis for each sorts
+def displayNodes1D(coordinates, impulses, sort, coordinate, dataPath) :
 	axis = ['x', 'y', 'z']
 
 	#Initialise pyplot figure
@@ -38,6 +36,7 @@ def displayNodes1D(coordinates, impulses, sort, coordinate, dataPath, color = 0)
 	#size of the gap between 2 nodes
 	hx = 1.255/100
 
+	#CALCULATING THE IMPULSE OF EACH NODE
 	#Array containing the impulse associated to each node of the grid
 	nodesImpulse = [0 for i in range(102)]
 	#Aray containing the number of particles associated to each node of the grid
@@ -56,14 +55,14 @@ def displayNodes1D(coordinates, impulses, sort, coordinate, dataPath, color = 0)
 		nodesImpulse[i] /= nodesNumber[i]
 
 	#Drawing the impulse value for each node of the grid
-	plt.plot(np.arange(102), nodesImpulse, 'ro', markersize=1, label="", color=curvCol[color%len(curvCol)][1])
+	plt.plot(np.arange(102), nodesImpulse, 'ro', markersize=1)
 
 
 #Generates a gnuplot file to be displayed using the commands :
 #gnuplot
 #scale = ?     --  (5000000/100/10) with respect to te sort of particle
 #plot 'filePath' u 1:2:($3*scale):($4*scale) with vectors
-def gnuplotFile(coordinates, impulses, sort, coordinate, dataPath, color = 0) :
+def gnuplotFile(coordinates, impulses, sort, coordinate, dataPath) :
 	axis = ['x', 'y', 'z']
 
 	#Creating new file
@@ -104,16 +103,16 @@ def gnuplotFile(coordinates, impulses, sort, coordinate, dataPath, color = 0) :
 	
 	file.close()
 
+	print("Sort", sort, ":")
 	print("px :", px)
 	print("py :", py)
-	print("pz :", pz)
+	print("pz :", pz, "\n")
 
 
 def run2D(dataPath, ax) :
 	#Reading data
 	dataSet = rd.readFile(dataPath)
 
-	axis = [True, False, False]
 	sorts = [True, True, True]
 
 	for sort in range(len(sorts)) :
@@ -133,19 +132,9 @@ def run2D(dataPath, ax) :
 			coordinates += [dataSet[sort+1][1][2]]
 			impulses += [dataSet[sort+1][1][5]]
 
-
-		# coordinates = [] #Values of the coordinates of the particles
-		# impulses = [] #Values of the impulses of the particles
-		# coordinate = []#Axis to display
-
-		# for ax in range(len(axis)) :
-		# 	if (axis[ax]) :
-		# 		coordinate += [ax]
-		# 		coordinates += [dataSet[sort+1][1][ax]]
-		# 		impulses += [dataSet[sort+1][1][2 + (ax+1)]]
-
 		impulses += [dataSet[sort+1][1][5]] #REMOVE !!
 		gnuplotFile(coordinates, impulses, sort, coordinate, dataPath)
+
 
 def run1D(dataPath, ax, nodes) :
 	#Reading data
@@ -205,8 +194,10 @@ def main() :
 				run1D(sys.argv[4], sys.argv[3], False)
 			elif (sys.argv[2] == "-n") :
 				run1D(sys.argv[4], sys.argv[3], True)
+				
 		elif (sys.argv[1] == "2D") :
 			run2D(sys.argv[3], sys.argv[2])
+
 		elif (sys.argv[1] == "-h") :
 			showHelp()
 

@@ -69,7 +69,7 @@ def display_impulses(impulses, sort, coordinate, dataPath, showMean=False, showV
 	if (showCurve) :
 		fImpulses = norm(velocity, amplitude, mean, variance)
 		plt.plot(velocity, fImpulses, markersize=0.1, label=label, color=curvCol[color%len(curvCol)][0])
-		plt.legend()
+		#plt.legend()
 
 
 #Initializes arguments and launch display_impulses function

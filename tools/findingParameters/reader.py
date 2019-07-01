@@ -323,64 +323,64 @@ def readPartFileDAT(nameFile, readSort, readAxis):
 
 
 
-#DISPLAY FIELD
+# #DISPLAY FIELD
 
-def readElec(nameFile) :
-	output = []
-	if (nameFile[-3:] == "dat") :
-		output = readElecDAT(nameFile)
-	elif (nameFile[-2:] == "nc") :
-		output = readElecCDF(nameFile)
-	else :
-		print("Wrong file format !")
-	return output
+# def readElec(nameFile) :
+# 	output = []
+# 	if (nameFile[-3:] == "dat") :
+# 		output = readElecDAT(nameFile)
+# 	elif (nameFile[-2:] == "nc") :
+# 		output = readElecCDF(nameFile)
+# 	else :
+# 		print("Wrong file format !")
+# 	return output
 
-def readElecDAT(nameFile) :
-	print("File : \"", nameFile, "\"")
-	print("Reading ...")
+# def readElecDAT(nameFile) :
+# 	print("File : \"", nameFile, "\"")
+# 	print("Reading ...")
 
-	try:
-		f = open(nameFile, "rb") #read binary
-		tab = np.zeros((3,102,6,6),dtype='d')
-		form = createFormatInt8(3672) # "<ld...dl"
+# 	try:
+# 		f = open(nameFile, "rb") #read binary
+# 		tab = np.zeros((3,102,6,6),dtype='d')
+# 		form = createFormatInt8(3672) # "<ld...dl"
 
-		for x in range(0,3):
-			#r receive dat string (binary ?)
-			r = f.read(29384)
-			#v recoit python string
-			v = struct.unpack(form, r)
-			tmp = 1
-			for i in range(0,102):
-				for j in range(0,6):
-					for k in range(0,6):
-						tab[x][i][j][k] = v[tmp]
-						tmp+=1
-	except IOError:
-		print("Error")
+# 		for x in range(0,3):
+# 			#r receive dat string (binary ?)
+# 			r = f.read(29384)
+# 			#v recoit python string
+# 			v = struct.unpack(form, r)
+# 			tmp = 1
+# 			for i in range(0,102):
+# 				for j in range(0,6):
+# 					for k in range(0,6):
+# 						tab[x][i][j][k] = v[tmp]
+# 						tmp+=1
+# 	except IOError:
+# 		print("Error")
 
-	finally:
-		f.close()
-		print("OK\n")
+# 	finally:
+# 		f.close()
+# 		print("OK\n")
 
-		#tab = [Ex[102][6][6],Ey[102][6][6],Ez[102][6][6]]
-		return tab
+# 		#tab = [Ex[102][6][6],Ey[102][6][6],Ez[102][6][6]]
+# 		return tab
 
-def readElecCDF(nameFile) :
-	data = Dataset(nameFile, "r", format="NETCDF4")
+# def readElecCDF(nameFile) :
+# 	data = Dataset(nameFile, "r", format="NETCDF4")
 
-	fields = []
+# 	fields = []
 
-	fieldsName = ["E", "M", "J", "Q"]
-	axis = ["x", "y", "z"]
+# 	fieldsName = ["E", "M", "J", "Q"]
+# 	axis = ["x", "y", "z"]
 
-	for i in range(3) :
-		tmp = fieldsName[0] + axis[i] 
-		fields += [ma.getdata(data.variables[tmp])]
+# 	for i in range(3) :
+# 		tmp = fieldsName[0] + axis[i] 
+# 		fields += [ma.getdata(data.variables[tmp])]
 
-	return fields
+# 	return fields
 
 
-#EPSYLON
+#FIELDS
 
 #Launch a reader depending on the file format
 def readFields(nameFile) :
@@ -393,7 +393,9 @@ def readFields(nameFile) :
 		print("Wrong file format !")
 	return output
 
-#Returns All fields values
+#Returns All fields values :
+#[E[x], E[y], E[z], M[x], M[y], M[z], C[x], C[y], C[z], E2[x], E2[y], E2[z]]
+#E[X] = tab[102][6][6]
 def readFieldsCDF(nameFile) :
 	data = Dataset(nameFile, "r", format="NETCDF4")
 
@@ -409,14 +411,16 @@ def readFieldsCDF(nameFile) :
 
 	return fields
 
-#Returns all field values
+#Returns all field values :
+#[E[x], E[y], E[z], M[x], M[y], M[z], C[x], C[y], C[z], E2[x], E2[y], E2[z]]
+#E[X] = tab[102][6][6]
 def readFieldsDAT(nameFile) :
 	print("File : \"", nameFile, "\"")
 	print("Reading ...\n")
 
 	try:
 		f = open(nameFile, "rb") #read binary
-		tab = np.zeros((12,102,6,6),dtype='d')
+		fields = np.zeros((12,102,6,6),dtype='d')
 		form = createFormatInt8(3672) # "<ld...dl"
 
 		for x in range(0,12):
@@ -428,7 +432,7 @@ def readFieldsDAT(nameFile) :
 			for i in range(0,102):
 				for j in range(0,6):
 					for k in range(0,6):
-						tab[x][i][j][k] = v[tmp]
+						fields[x][i][j][k] = v[tmp]
 						tmp+=1
 	except IOError:
 		print("Error")
@@ -436,6 +440,6 @@ def readFieldsDAT(nameFile) :
 	finally:
 		f.close()
 		print("OK")
-		#tab = [E[3],M[3],C[3],E2[3]]
+		#fields = [E[3],M[3],C[3],E2[3]]
 
-		return tab
+		return fields
