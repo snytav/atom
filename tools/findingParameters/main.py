@@ -1,4 +1,3 @@
-#from netCDF4 import Dataset
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
@@ -184,7 +183,7 @@ def main() :
 
 			#openning repositories
 			files = rd.openRep(files)
-			
+
 			eps.runEpsylon(files)
 
 		elif (sys.argv[1] == "-ppd") :#PHASE PLANE DIAGRAMS
