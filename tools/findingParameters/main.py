@@ -155,7 +155,7 @@ def main() :
 				tmp += 1
 
 			#Launching the impulse display
-			imp.runImpulse(files, sorts, axis, options)
+			imp.orderTasks(files, sorts, axis, options)
 
 		elif (sys.argv[1] == "-f") : #FIELD
 			files = []
