@@ -11,6 +11,8 @@ import epsylon as eps
 import phasePlanD as ppd
 import velocity as vlc
 
+import paraImpulses as pImp
+
 
 def showHelp() :
 	print("In order to display the format of the loaded file :")
@@ -144,6 +146,8 @@ def main() :
 					options[1] = True
 					options[2] = True
 				elif (sys.argv[tmp] == "-c") :
+					options[1] = True
+					options[2] = True
 					options[3] = True
 				else :
 					print("Wrong arguments !")
@@ -155,7 +159,8 @@ def main() :
 				tmp += 1
 
 			#Launching the impulse display
-			imp.orderTasks(files, sorts, axis, options)
+			#imp.orderTasks(files, sorts, axis, options)
+			pImp.orderTasks(files, sorts, axis, options)
 
 		elif (sys.argv[1] == "-f") : #FIELD
 			files = []

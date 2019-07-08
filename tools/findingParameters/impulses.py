@@ -21,6 +21,27 @@ def categorize(impulses, size, minim, delta) :
 	return categories
 
 
+#Send the variance to the output
+def partMean(impulses, output) :
+	var = statistics.mean(impulses) #compute variance
+	output.put(var)
+
+
+#Send the variance to the output
+def partVariance(impulses, output) :
+	var = statistics.variance(impulses) #compute variance
+	output.put(var)
+
+
+#Return the combination of all the variances
+def groupVar(variances, tasks) :
+	var = 0
+
+	for i in range(len(variances)) :
+		var += variances[i]*(tasks[i+1]-tasks[i])
+
+	return (var/(tasks[-1]))
+
 #Displays the number of particles in each impulses-category of width delta
 def displayImpulse(impulses, velocity, categories, sort, coordinate, options) :
 	[showMean, showVariance, showCurve] = options
@@ -31,7 +52,28 @@ def displayImpulse(impulses, velocity, categories, sort, coordinate, options) :
 		#determine yAxis max which corresponds to the impulse category containing the more particles
 		amplitude = max(categories) - min(categories)
 
-		mean = statistics.mean(impulses) #compute the mean
+		# Define an output queue
+		output = mp.Queue()
+
+		#Determining the repartition oftasks betweens processes
+		nbCPU = mp.cpu_count()
+		nbTasks = len(impulses)//nbCPU
+		tasks = [0] + [nbTasks*i for i in range(1,nbCPU+1)]
+		tasks[-1] = len(impulses)
+
+		# Setup a list of processes that we want to run
+		processes = [mp.Process(target=partMean, args=(impulses[tasks[i]: tasks[i+1]], output)) for i in range(nbCPU)]
+
+		# Run processes
+		for p in processes:
+		    p.start()
+
+		# Exit the completed processes
+		for p in processes:
+		    p.join()
+
+		# Get process results from the output queue
+		mean = statistics.mean([output.get() for p in processes])
 		print("Mean for Sort " + str(sort+1) + " - " + axis[coordinate-1] + " axis : " + str(mean)) #print mean
 
 		#Displays Mean
@@ -39,18 +81,35 @@ def displayImpulse(impulses, velocity, categories, sort, coordinate, options) :
 		plt.text(x = mean, y=0.75*amplitude, s="m:"+str(mean), verticalalignment='center', color="green")
 
 	if (showVariance) :
-		variance = statistics.variance(impulses) #compute variance
+		# Define an output queue
+		output = mp.Queue()
+
+		#Determining the repartition oftasks betweens processes
+		nbCPU = mp.cpu_count()
+		nbTasks = len(impulses)//nbCPU
+		tasks = [0] + [nbTasks*i for i in range(1,nbCPU+1)]
+		tasks[-1] = len(impulses)
+
+		# Setup a list of processes that we want to run
+		processes = [mp.Process(target=partVariance, args=(impulses[tasks[i]: tasks[i+1]], output)) for i in range(nbCPU)]
+
+		# Run processes
+		for p in processes:
+		    p.start()
+
+		# Exit the completed processes
+		for p in processes:
+		    p.join()
+
+		# Get process results from the output queue
+		variance = groupVar([output.get() for p in processes], tasks)
+		
 		print("Variance for Sort " + str(sort+1) + " - " + axis[coordinate-1] + " axis : " + str(variance)) #print variance 
 		
 		#Displays Variance
 		plt.text(x = mean, y=0.7*amplitude, s="v:"+str(variance), verticalalignment='center', color="green")
 
 	if (showCurve) :
-		if (not showMean) :
-			amplitude = max(categories) - min(categories)
-			mean = statistics.mean(impulses)
-			variance = statistics.variance(impulses)
-
 		#Display the function followed by the impulses
 		fImpulses = norm(velocity, amplitude, mean, variance)
 		label = "sort " + str(sort+1) + " - axis " + str(coordinate+1) 
