@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 import statistics
 import numpy.ma as ma
+import os
+import multiprocessing as mp
 import reader as rd
 
 #Normal Law
@@ -19,107 +21,88 @@ def categorize(impulses, size, minim, delta) :
 	return categories
 
 
-#displays the impulses by categories of width delta
-#particle sorts : 0, 1 or 2
-#coordinate : x=1, y=2, z=3
-def display_impulses(impulses, sort, coordinate, dataPath, showMean=False, showVariance=False, showCurve=False, delta=0.0001, color=0) :
-	#Getting bounds of Impulses
-	minim = min(impulses)
-	maxim = max(impulses)
+#Displays the number of particles in each impulses-category of width delta
+def displayImpulse(impulses, velocity, categories, sort, coordinate, options) :
+	[showMean, showVariance, showCurve] = options
 
-	#Number of impulse categories
-	#Represents the number of dots on the xAxis
-	size = int((maxim - minim)//delta) + 1 
-
-	#Arrays containing the categories of impulses for X axis
-	velocity = np.arange(minim, maxim, delta)
-
-	#Values for Y axis
-	categories = categorize(impulses, size, minim, delta)
-
-	#determine yAxis max which corresponds to the impulse category containing the more particles
-	amplitude = max(categories) - min(categories)
-
-	#Colors of the curve
-	curvCol = [['red', '#e136ec'], ['blue', '#36b9ec'], ['green', '#86ec36']]
 	axis = ['x', 'y', 'z']
 
-	#Show Mean
-	mean = statistics.mean(impulses) #compute the mean
-	print("Mean for Sort " + str(sort+1) + " - " + axis[coordinate-1] + " axis : " + str(mean)) #print mean
-
-	#Displays Mean
 	if (showMean) :
-		plt.axvline(x = mean, markersize=0.1, color=curvCol[sort][0])
-		plt.text(x = mean, y=0.75*amplitude, s="m:"+str(mean), verticalalignment='center', color=curvCol[color%len(curvCol)][1])
+		#determine yAxis max which corresponds to the impulse category containing the more particles
+		amplitude = max(categories) - min(categories)
 
-	#Show Variance
-	variance = statistics.variance(impulses) #compute variance
-	print("Variance for Sort " + str(sort+1) + " - " + axis[coordinate-1] + " axis : " + str(variance)) #print variance 
-	
-	#Displays Variance
+		mean = statistics.mean(impulses) #compute the mean
+		print("Mean for Sort " + str(sort+1) + " - " + axis[coordinate-1] + " axis : " + str(mean)) #print mean
+
+		#Displays Mean
+		plt.axvline(x = mean, markersize=0.1, color="green")
+		plt.text(x = mean, y=0.75*amplitude, s="m:"+str(mean), verticalalignment='center', color="green")
+
 	if (showVariance) :
-		plt.text(x = mean, y=0.7*amplitude, s="v:"+str(variance), verticalalignment='center', color=curvCol[color%len(curvCol)][1])
+		variance = statistics.variance(impulses) #compute variance
+		print("Variance for Sort " + str(sort+1) + " - " + axis[coordinate-1] + " axis : " + str(variance)) #print variance 
+		
+		#Displays Variance
+		plt.text(x = mean, y=0.7*amplitude, s="v:"+str(variance), verticalalignment='center', color="green")
 
-	#Display the Impulses classified by categories
-	label = dataPath + " : sort " + str(sort+1) + " - axis " + str(coordinate+1) 
-	plt.plot(velocity, categories, 'ro', markersize=0.2, label="", color=curvCol[color%len(curvCol)][1])
-
-	#Display the function followed by the impulses
 	if (showCurve) :
+		if (not showMean) :
+			amplitude = max(categories) - min(categories)
+			mean = statistics.mean(impulses)
+			variance = statistics.variance(impulses)
+
+		#Display the function followed by the impulses
 		fImpulses = norm(velocity, amplitude, mean, variance)
-		plt.plot(velocity, fImpulses, markersize=0.1, label=label, color=curvCol[color%len(curvCol)][0])
+		label = "sort " + str(sort+1) + " - axis " + str(coordinate+1) 
+		plt.plot(velocity, fImpulses, markersize=0.1, label=label, color="green")
 		#plt.legend()
 
+	#Display the Impulses classified by categories
+	plt.plot(velocity, categories, 'ro', markersize=0.2)
+	
 
-#Initializes arguments and launch display_impulses function
-def runImpulse(dataPath, sorts= [False, True, True], axis= [True, False, False]) :
+#Calculates all that is needed to display the impulses
+def prepareDisplay(files, sort, ax, options, delta=0.0001) :
+	axis = ["x", "y", "z"]
+	sep = options[0]
+	for file in files :
+		#load data
+		impulses = rd.readImpulse(file, sort, ax)
 
-	#Display curves separetely or compare them 
-	separatedFiles = False
-	#Display axis separetely
-	separatedAxis = True
+		#Getting bounds of Impulses
+		minim = min(impulses)
+		maxim = max(impulses)
 
-	dataSet = []
+		#Number of impulse categories
+		#Represents the number of dots on the xAxis
+		size = int((maxim - minim)//delta) + 1 
 
-	if (separatedAxis) :
-		#load all dataSets
-		for dp in range(len(dataPath)) :
-			dataSet += [rd.readImpulses(dataPath[dp], sorts, axis)]
+		#Array representing the categories of impulses (X axis)
+		velocity = np.arange(minim, maxim, delta)
 
-		#display each axis selected
-		for ax in range(len(axis)) :
-			if (axis[ax]) :
-				plt.figure("Sort - Axis")
+		#Array containing the number of particles in each categories
+		categories = categorize(impulses, size, minim, delta)
 
-				#display each sorts selected
-				for sort in range(len(sorts)) :
-					if (sorts[sort]) :
+		if sep :
+			name = file + " : sort " + str(sort+1) + " - axis " + axis[ax] 
+			plt.figure(name)
 
-						#display from all files
-						for ds in range(len(dataSet)) :
-							print(dataPath[ds])
-							impulsesSortAxis = dataSet[ds][sort+1][1][2 + (ax+1)]
-							display_impulses(impulsesSortAxis, sort, (ax+1), dataPath[ds], showCurve=True, color=ds)
-	else :
-		for dp in dataPath :
-			#load data
-			dataSet = rd.readImpulses(dp)
+		displayImpulse(impulses, velocity, categories, sort, ax, options[1:])
 
-			if (separatedFiles) :
-				plt.figure("Sort - Axis")
 
-			#display each sort selected
-			for sort in range(len(sorts)) :
-				if (sorts[sort]) :
+#displays the impulses in the right order
+#depending on the sort, the axis and the file
+def orderTasks(filesPaths, sorts, axis, options) :
+	axisName = ["x", "y", "z"]
 
-					#display each axis selected
-					for ax in range(len(axis)) :
-						if (axis[ax]) :
-							#values on the 'ax+1' axis of impulses for sort 'sort+1'
-							impulsesSortAxis = dataSet[sort+1][1][2 + (ax+1)]
-							display_impulses(impulsesSortAxis, sort, (ax+1))
+	for sort in range(len(sorts)) :
+		if (sorts[sort]) :
 
-	plt.xlabel('Impulse')
-	plt.ylabel('Number of Particles')
+			for ax in range(len(axis)) :
+				if (axis[ax]) :
+					if (not options[0]) :
+						name = "Sort " + str(sort+1) + " - Axis " + axisName[ax]
+						plt.figure(name)
+
+					prepareDisplay(filesPaths, sort, ax, options)
 	plt.show()

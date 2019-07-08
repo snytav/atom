@@ -16,14 +16,14 @@ def showHelp() :
 	print("In order to display the format of the loaded file :")
 	print("python3 main.py -format inputFile\n")
 	print("In order to display impulses, type :")
-	print("python3 main.py -i inputFile(s) -s 2 3 -a x\n")
+	print("python3 main.py -i inputFile(s) -s 2 3 -a x [-options : sep, m, v, c]\n")
 	print("In order to display fields, type :")
-	print("python3 main.py -e inputFile -s fieldNumber -yz 2 3\n")
+	print("python3 main.py -f inputFile -s fieldNumber -yz 2 3\n")
 	print("\tTo display electric field :")
-	print("\tpython3 main.py -e inputFile -s 0 -yz 2 3\n")
+	print("\tpython3 main.py -f inputFile -s 0 -yz 2 3\n")
 	print("\tThe value for -s can be between 0 & 3, example : ")
 	print("\tTo display magnetic field & currant field :")
-	print("\tpython3 main.py -e inputFile -s 1 2 -yz 2 3\n")
+	print("\tpython3 main.py -f inputFile -s 1 2 -yz 2 3\n")
 	print("In order to calculate electric field energy, type :")
 	print("python3 main.py -epsylon inputFile(s) \n")
 	print("In order display plane phase diagram, type :")
@@ -66,13 +66,19 @@ def main() :
 	else :
 		if (sys.argv[1] == "-i") : #IMPULSES
 			files = []
+
 			stringSorts = []
-			stringAxis = []
 			sorts = [False, False, False]
+			
+			stringAxis = []
 			axis = [False, False, False]
+			
+			#[Separated, ShowMean, ShowVariance, ShowCurve]
+			options = [False, False, False, False]
+			
 			tmp = 2
 
-			# #Getting files path
+			#Getting files paths
 			while (sys.argv[tmp][0] != "-") :
 				files += [sys.argv[tmp]]
 				tmp += 1
@@ -80,6 +86,7 @@ def main() :
 			#openning repositories
 			files = rd.openRep(files)
 
+			#SORTS
 			#Getting sorts to treat
 			if (sys.argv[tmp] != "-s") :
 				print("Wrong arguments ! (sort)")
@@ -90,17 +97,7 @@ def main() :
 				stringSorts += [sys.argv[tmp]]
 				tmp += 1
 
-			#Getting axis to treat
-			if (sys.argv[tmp] != "-a") :
-				print("Wrong arguments ! (axis)")
-				showHelp()
-				return(-1)
-			tmp += 1
-			while (tmp < len(sys.argv)) :
-				stringAxis += [sys.argv[tmp]]
-				tmp += 1
-
-			#Converting arguments
+			#Converting sorts
 			for s in stringSorts :
 				if (s == "1") :
 					sorts[0] = True
@@ -112,6 +109,17 @@ def main() :
 					print("Wrong arguments ! (sort value)")
 					showHelp()
 					return(-1)
+
+			#AXIS
+			#Getting axis to treat
+			if (sys.argv[tmp] != "-a") :
+				print("Wrong arguments ! (axis)")
+				showHelp()
+				return(-1)
+			tmp += 1
+			while ((tmp < len(sys.argv)) and (sys.argv[tmp][0] != "-")) :
+				stringAxis += [sys.argv[tmp]]
+				tmp += 1
 
 			#Determining the axis to display
 			for a in stringAxis :
@@ -126,10 +134,30 @@ def main() :
 					showHelp()
 					return(-1)
 
-			#Launching the impulse display
-			imp.runImpulse(files, sorts, axis)
+			#Determining options
+			while (tmp<len(sys.argv)) :
+				if (sys.argv[tmp] == "-sep") :
+					options[0] = True
+				elif (sys.argv[tmp] == "-m") :
+					options[1] = True
+				elif (sys.argv[tmp] == "-v") :
+					options[1] = True
+					options[2] = True
+				elif (sys.argv[tmp] == "-c") :
+					options[3] = True
+				else :
+					print("Wrong arguments !")
+					print("Options :")
+					print("-sep : displays the impulses separetely for each files")
+					print("-m : calculates and displays the mean")
+					print("-v : calculates and displays the variance")
+					print("-c : displays a the gaussian curve that is followed by the impulses")
+				tmp += 1
 
-		elif (sys.argv[1] == "-e") : #FIELD
+			#Launching the impulse display
+			imp.runImpulse(files, sorts, axis, options)
+
+		elif (sys.argv[1] == "-f") : #FIELD
 			files = []
 			sorts = []
 			axis = []
