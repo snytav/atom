@@ -8,6 +8,16 @@ from mayavi import mlab
 import reader as rd
 
 
+def impulseToSpeed(impulses) :
+	speed = [[], [], []]
+	for i in range(len(impulses[0])) :
+		gamma = (impulses[0][i]**2 + impulses[1][i]**2 + impulses[2][i]**2 )**0.5
+		speed[0] += [impulses[0][i] / gamma]   #!!!! ABS ??
+		speed[1] += [impulses[1][i] / gamma]   #!!!! ABS ??
+		speed[2] += [impulses[2][i] / gamma]   #!!!! ABS ??
+	return speed
+
+
 #Display the impulse of each particles for each sorts
 def displayParticles1D(coordinates, impulses, sort, coordinate, dataPath) :
 	axis = ['x', 'y', 'z']
@@ -45,25 +55,24 @@ def displayNodes1D(coordinates, impulses, sort, coordinate, dataPath) :
 	#Aray containing the number of particles associated to each node of the grid
 	nodesNumber = [0 for i in range(102)] #x-axis
 	for i in range(len(impulses)) :
-		nodesImpulse[int(round(coordinates[i]/hx))] += impulses[i]
-		nodesNumber[int(round(coordinates[i]/hx))] += 1
-
-	#Avoiding divisions by zero
-	for i in range(len(nodesNumber)) :
-		if (nodesNumber[i] == 0) :
-			nodesNumber[i] = 1
+		index = int(round(coordinates[i]/hx))
+		nodesImpulse[index] += impulses[i]
+		nodesNumber[index] += 1
 
 	#each node receive the mean impulse among all the particle associated to it
 	for i in range(len(nodesImpulse)) :
+		#Avoiding divisions by zero
+		if (nodesNumber[i] == 0) :
+			nodesNumber[i] = 1
 		nodesImpulse[i] /= nodesNumber[i]
 
 	#Drawing the impulse value for each node of the grid
 	plt.plot(np.arange(102), nodesImpulse, 'ro', markersize=1)
 
 
-def run1D(dataPath, ax, nodes) :
+def run1D(dataPath, ax, nodes, speed) :
 	#Reading data
-	dataSet = rd.readFile(dataPath)#readImpulses(dataPath, sorts, axis)
+	dataSet = rd.readFile(dataPath)
 
 	axis = [False, False, False]
 	sorts = [True, True, True]
@@ -89,7 +98,12 @@ def run1D(dataPath, ax, nodes) :
 
 					#Getting data to display
 					coordinates = dataSet[sort+1][1][ax]
-					impulses = dataSet[sort+1][1][2 + (ax+1)]
+
+					if (speed) :
+						impulses = dataSet[sort+1][1][3:]
+						impulses = impulsesToSpeed(impulses)[ax]
+					else :
+						impulses = dataSet[sort+1][1][2 + (ax+1)]
 
 					if (nodes) :
 						displayNodes1D(coordinates, impulses, sort, (ax+1), dataPath)
@@ -149,7 +163,7 @@ def gnuplotFile(coordinates, impulses, sort, coordinate, dataPath) :
 	#print("pz :", pz, "\n")
 
 
-def run2D(dataPath, ax) :
+def run2D(dataPath, ax, speed) :
 	sorts = [True, True, True]
 
 	for sort in range(len(sorts)) :
@@ -157,6 +171,9 @@ def run2D(dataPath, ax) :
 		#Loading x-axis values
 		coordinate = [0] #Values of the coordinates of the particles
 		[coordinates, impulses] = rd.readCoorImp(dataPath, sort)
+
+		if (speed) :
+			impulses = impulseToSpeed(impulses)
 
 		#Loading y-axis values
 		if (ax == "y") :
@@ -264,21 +281,28 @@ def displayNodes3D(impulses, sort, scale) :
 
 
 # Loads the coordinates and impulses for matplotlib display
-def runParticles3D(path, sorts, scale) :
+def runParticles3D(path, sorts, scale, speed=False) :
 	for sort in range(len(sorts)) :
 		if (sorts[sort]) :
 			[coordinates, impulses] = rd.readCoorImp(path, sort)
+
+			if (speed) :
+				impulses = impulseToSpeed(impulses)
+
 			displayParticles3D(coordinates, impulses, sort, scale)
 
 
 # Loads the impulses for mayavi display
-def runNodes3D(path, sorts, scl = 1) :
+def runNodes3D(path, sorts, scl = 1, speed=False) :
 	size = (102, 6, 6, 3)
 	h = 1.255/100
 
 	for sort in range(len(sorts)) :
 		if (sorts[sort]) :
 			[coordinates, impulses] = rd.readCoorImp(path, sort)
+
+			if (speed) :
+				impulses = impulseToSpeed(impulses)
 
 			# Hold the sum of the impulses of all the particles around each node
 			grid = [[[[0 for ax in range(size[3])] for z in range(size[2])] for y in range(size[1])] for x in range(size[0])]
@@ -334,20 +358,29 @@ def showHelp() :
 	print("\tpython3 displayImpulses.py 3D inputFile 1/2/3 -n\n")
 	print("\tIn order to precise the scale :")
 	print("\tpython3 displayImpulses.py 3D inputFile 1/2/3 -scale 10 -n/-p\n")
+	print("\nIn order to display the speed instead of impulses, add -s at the end\n")
 
 
 def main() :
 	if (len(sys.argv) == 1) :
 		print("To display help, type :\npython3 main.py -h")
 	else :
+		# Displaying speed instead of impulses
+		speed = False
 		if (sys.argv[1] == "1D") :
-			if (sys.argv[2] == "-p") :
-				run1D(sys.argv[4], sys.argv[3], False)
-			elif (sys.argv[2] == "-n") :
-				run1D(sys.argv[4], sys.argv[3], True)
+			if ((len(sys.argv) == 3) and (sys.argv[2] == "-s")) :
+				speed = True
 				
+			if (sys.argv[2] == "-p") :
+				run1D(sys.argv[4], sys.argv[3], False, speed)
+			elif (sys.argv[2] == "-n") :
+				run1D(sys.argv[4], sys.argv[3], True, speed)
+
 		elif (sys.argv[1] == "2D") :
-			run2D(sys.argv[3], sys.argv[2])
+			if ((len(sys.argv) == 3) and (sys.argv[2] == "-s")) :
+				speed = True
+
+			run2D(sys.argv[3], sys.argv[2], speed)
 
 		elif (sys.argv[1] == "3D") :
 			path = sys.argv[2]
@@ -373,10 +406,13 @@ def main() :
 				scale = float(sys.argv[tmp])
 				tmp += 1
 			
+			if ((tmp<len(sys.argv)) and (sys.argv[tmp+1] == "-s")) :
+				speed = True
+			
 			if (sys.argv[tmp] == "-p") :
-				runParticles3D(path, sorts, scale)
+				runParticles3D(path, sorts, scale, speed)
 			elif (sys.argv[tmp] == "-n") :
-				runNodes3D(path, sorts, scale)
+				runNodes3D(path, sorts, scale, speed)
 			plt.show()
 
 
