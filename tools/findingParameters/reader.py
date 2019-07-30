@@ -185,7 +185,6 @@ def readCoorImpCDF(file, sort) :
 
 	return [coordinates, impulses]
 
-
 def readFile(nameFile) :
 	output = []
 	if (nameFile[-3:] == "dat") :
@@ -484,6 +483,7 @@ def readField(nameFile, sort) :
 		print("Wrong file format !")
 	return output
 
+
 #Returns x-values of one fields :
 #[F[x], F[y], F[z]]
 #F[X] = tab[102][6][6]
@@ -497,6 +497,7 @@ def readFieldCDF(nameFile, sort) :
 	field = ma.getdata(data.variables[tmp])
 
 	return field
+
 
 #Returns x-values of one fields :
 #[F[x], F[y], F[z]]
@@ -535,71 +536,6 @@ def readFieldDAT(nameFile, sort) :
 
 		return field
 
-'''
-
-#Launch a reader depending on the file format
-def readFields(nameFile) :
-	output = []
-	if (nameFile[-3:] == "dat") :
-		output = readFieldsDAT(nameFile)
-	elif (nameFile[-2:] == "nc") :
-		output = readFieldsCDF(nameFile)
-	else :
-		print("Wrong file format !")
-	return output
-
-#Returns All fields values :
-#[E[x], E[y], E[z], M[x], M[y], M[z], C[x], C[y], C[z], E2[x], E2[y], E2[z]]
-#E[X] = tab[102][6][6]
-def readFieldsCDF(nameFile) :
-	data = Dataset(nameFile, "r", format="NETCDF4")
-
-	fields = []
-
-	fieldsName = ["E", "M", "J", "Q"]
-	axis = ["x", "y", "z"]
-
-	for i in range(4) :
-		for j in range(3) :
-			tmp = fieldsName[i] + axis[j] 
-			fields += [ma.getdata(data.variables[tmp])]
-
-	return fields
-
-#Returns all field values :
-#[E[x], E[y], E[z], M[x], M[y], M[z], C[x], C[y], C[z], E2[x], E2[y], E2[z]]
-#E[X] = tab[102][6][6]
-def readFieldsDAT(nameFile) :
-	print("File : \"", nameFile, "\"")
-	# print("Reading ...\n")
-
-	try:
-		f = open(nameFile, "rb") #read binary
-		fields = np.zeros((12,102,6,6),dtype='d')
-		form = createFormatInt8(3672) # "<ld...dl"
-
-		for x in range(0,12):
-			#r receive dat string (binary ?)
-			r = f.read(29384)
-			#v recoit python string
-			v = struct.unpack(form, r)
-			tmp = 1
-			for i in range(0,102):
-				for j in range(0,6):
-					for k in range(0,6):
-						fields[x][i][j][k] = v[tmp]
-						tmp+=1
-	except IOError:
-		print("Error")
-
-	finally:
-		f.close()
-		# print("OK")
-		#fields = [E[3],M[3],C[3],E2[3]]
-
-		return fields
-
-'''
 
 #READ ONLY ELECTRIC FIELD
 

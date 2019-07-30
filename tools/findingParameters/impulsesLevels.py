@@ -1,3 +1,5 @@
+import argparse
+
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
@@ -41,6 +43,7 @@ def groupVar(variances, tasks) :
 		var += variances[i]*(tasks[i+1]-tasks[i])
 
 	return (var/(tasks[-1]))
+
 
 #Displays the number of particles in each impulses-category of width delta
 def displayImpulse(impulses, velocity, categories, sort, coordinate, options) :
@@ -145,6 +148,13 @@ def prepareDisplay(files, sort, ax, options, delta=0.0001) :
 		if sep :
 			name = file + " : sort " + str(sort+1) + " - axis " + axis[ax] 
 			plt.figure(name)
+			
+		title = "Sort " + str(sort+1) + " - Axis " + str(axis[ax])
+		plt.title(title)
+		ylabel = "Number particles"
+		plt.ylabel(ylabel)
+		xlabel = str(axis[ax])
+		plt.xlabel(xlabel)
 
 		displayImpulse(impulses, velocity, categories, sort, ax, options[1:])
 
@@ -165,3 +175,53 @@ def orderTasks(filesPaths, sorts, axis, options) :
 
 					prepareDisplay(filesPaths, sort, ax, options)
 	plt.show()
+
+
+def main() :
+	parser = argparse.ArgumentParser(description="Display the number of particles classified by level of impulses.")
+
+	parser.add_argument("sort", type=int, choices=[1, 2, 3], help="Sorts of particles to display", nargs="+")
+	parser.add_argument("axis", type=str, choices=['x','y','z'], help="Axis to display", nargs="+")
+	parser.add_argument("--sep", "--separated", action="store_true", help="Represent each file on different figures")
+	parser.add_argument("-m", "--mean", action="store_true", help="Dislpay the mean impulse")
+	parser.add_argument("-v", "--variance", action="store_true", help="Dislpay the variance of impulses")
+	parser.add_argument("-c", "--curve", action="store_true", help="Dislpay the repartition curve of the particles")
+	parser.add_argument("FILE", type=str, help="List of files to be displayed", nargs="+")
+
+	args = parser.parse_args()
+
+	#Parsing sorts
+	sorts = [False, False, False]
+	for sort in args.sort :
+		if (sort == 1) :
+			sorts[0] = True
+		elif (sort == 2) :
+			sorts[1] = True
+		elif (sort == 3) :
+			sorts[2] = True
+
+	#Parsing axis
+	axis = [False, False, False]
+	for a in args.axis :
+		if (a == "x") :
+			axis[0] = True
+		elif (a == "y") :
+			axis[1] = True
+		elif (a == "z") :
+			axis[2] = True
+
+	#Parsing other options
+	options = [args.sep, args.mean, args.variance, args.curve]
+	if (args.curve) :
+		options[1] = True
+		options[2] = True
+	elif (args.variance) :
+		options[1] = True
+
+	#Parsing files
+	files = rd.openRep(args.FILE)
+
+	# #Launching the impulse display
+	orderTasks(files, sorts, axis, options)
+
+main()

@@ -1,12 +1,12 @@
 import os
 import multiprocessing as mp
-import random
 import string
 import reader as rd
 import sys
-import multiprocessing
 import matplotlib.pyplot as plt
 import numpy as np
+import reader as rd
+import argparse
 
 
 #Returns the epsylon of the files input associated to the id of the process to get the order
@@ -27,10 +27,11 @@ def epsylon(files, pid, output) :
 					sum += Ex[ix][iy][iz]**2 + Ey[ix][iy][iz]**2 + Ez[ix][iy][iz]**2
 		epsylons += [sum]
 
-	output.put([pid,epsylons])
+	output.put([pid, epsylons])
 
 
 def displayEpsylon(epsylons) :
+	plt.figure("Epsylon")
 	plt.xlabel('Time')
 	plt.ylabel('Epsylon')
 	plt.plot(np.arange(len(epsylons)), epsylons, markersize=0.1)
@@ -52,13 +53,14 @@ def sortEps(epsylons) :
 
 
 def runEpsylon(files) :
-	print(files)
+	for file in files :
+		print(file)
 
 	# Define an output queue
 	output = mp.Queue()
 
 	#Determining the repartition oftasks betweens processes
-	nbCPU = multiprocessing.cpu_count()
+	nbCPU = mp.cpu_count()
 	nbTasks = len(files)//nbCPU
 	tasks = [0] + [nbTasks*i for i in range(1,nbCPU+1)]
 	tasks[-1] = len(files)
@@ -78,3 +80,18 @@ def runEpsylon(files) :
 	epsylons = sortEps([output.get() for p in processes])
 
 	displayEpsylon(epsylons)
+
+
+def main() :
+	parser = argparse.ArgumentParser(description="Calculate the energy \'epsilon\' of the electric field and displays the result on a graph.")
+
+	parser.add_argument("FILE", type=str, help="List of files to be treated", nargs="+")
+
+	args = parser.parse_args()
+
+	files = rd.openRep(args.FILE)
+
+	runEpsylon(files)
+
+
+main()

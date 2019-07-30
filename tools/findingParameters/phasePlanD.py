@@ -5,6 +5,7 @@ import statistics
 import numpy.ma as ma
 import reader as rd
 import multiprocessing as mp
+import argparse
 
 import time
 
@@ -164,3 +165,20 @@ def runPhasePlan(files, nbBatchs = 100) :
 				displayPhasePlanDiagram(indexs[sort][batch], speeds, data[1+sort][1][0], batch)
 
 	plt.show()
+
+
+def main() :
+	parser = argparse.ArgumentParser(description="Classify particles in batch depending on there impulse x and display their evolution file to file")
+
+	parser.add_argument("-n", "--number", type=int, help="Number of batch to make out of impulses/speed")
+	parser.add_argument("FILE", type=str, help="List of files to be displayed", nargs="+")
+
+	args = parser.parse_args()
+
+	files = rd.openRep(args.FILE)
+
+	nbBatchs = args.number
+
+	runPhasePlan(files, nbBatchs)
+
+main()
