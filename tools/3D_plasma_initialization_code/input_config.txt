@@ -25,3 +25,5 @@
 1						# electrons mass
 1						# beams mass
 1836					# ions mass
+
+2						# electrons distribution type (1 = uniform, 2 = sinusoidal)
