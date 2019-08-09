@@ -1,0 +1,29 @@
+1.1424					# domain x length
+0.05					# domain y length
+0.05					# domain z length
+
+100						# domain x cells number
+4						# domain y cells number
+4						# domain z cells number
+
+50						# subdomain x cells number
+2						# subdomain y cells number
+2						# subdomain z cells number
+
+1000					# average triplets number in cell
+
+0.01					# sinusoidal density function B value 
+
+0.001					# electrons temperature (Te)
+
+0.14					# beams x velocity (Vbx)
+
+-1						# electrons charge
+1						# beams charge 
+1						# ions charge
+
+1						# electrons mass
+1						# beams mass
+1836					# ions mass
+
+2						# electrons distribution type (1 = uniform, 2 = sinusoidal)
