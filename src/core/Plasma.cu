@@ -489,10 +489,10 @@ void Plasma::SetPeriodicCurrents() {
 void Plasma::AssignCellsToArraysGPU() {
     int Nx = pd->nx, Ny = pd->ny, Nz = pd->nz;
     int err;
-    size_t sz;
     dim3 dimGrid(Nx, Ny, Nz), dimBlockExt(CellExtent, CellExtent, CellExtent);
 
 #ifdef DEBUG
+    size_t sz;
     err = cudaDeviceGetLimit(&sz, cudaLimitStackSize);
     CHECK_ERROR("DEVICE LIMIT", err);
     printf("%s:%d - stack limit %d\n", __FILE__, __LINE__, ((int) sz));
@@ -918,9 +918,11 @@ void Plasma::writeDataToFile(int step) {
     string filename = dataFileStartPattern + step_str + dataFileEndPattern;
     int Nx = pd->nx, Ny = pd->ny, Nz = pd->nz;
     int nb_particles = Nx * Ny * Nz * pd->lp;
+    int ncid;
+   
+    nc_create(filename.c_str(), NC_CLOBBER, &ncid);
+    nc_close(ncid);
 
-    NcFile dataFile(filename, NcFile::replace);
-    dataFile.close();
 
     // copy dimensions
     NetCDFManipulator::plsm_add_dimension(filename.c_str(), "x", NX);

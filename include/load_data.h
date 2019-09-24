@@ -14,8 +14,8 @@
 
 #include "particle.h"
 #include "maxwell.h"
-#include "NetCdf/read_file.h"
-#include "NetCdf/NetCdfData.h"
+#include "../src/utils/NetCdf/read_file.h"
+#include "../src/utils/NetCdf/NetCdfData.h"
 #include "archAPI.h"
 
 void readParticleParamsOneSort(const char *, int *, double *, double *, int);

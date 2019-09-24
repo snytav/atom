@@ -1,9 +1,11 @@
-#include "../../../include/NetCdf/read_file.h"
+#include "read_file.h"
 
 int copyFile(const char *binaryFileName, const char *netCdfFileName) {
     ifstream ifs(binaryFileName, ios::binary);
-    NcFile dataFile(netCdfFileName, NcFile::replace);
-    dataFile.close();
+    int ncid;
+   
+    nc_create(netCdfFileName, NC_CLOBBER, &ncid);
+    nc_close(ncid);
 
     // copy dimensions
     NetCDFManipulator::plsm_add_dimension(netCdfFileName, "x", NX);
