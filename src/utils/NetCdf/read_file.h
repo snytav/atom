@@ -4,9 +4,10 @@
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
-#include <netcdf>
+#include <netcdf.h>
 #include <vector>
 #include <unistd.h>
+#include <string.h>
 #include "plasma_netcdf.h"
 
 #define ELECTRIC_FIELD_LABEL string("E")
@@ -31,9 +32,7 @@
 
 using namespace std;
 
-using namespace netCDF;
 using namespace plasmanetcdf;
-using namespace netCDF::exceptions;
 
 static const int NX = 102;
 static const int NY = 6;

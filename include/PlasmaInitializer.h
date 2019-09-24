@@ -9,8 +9,8 @@
 #include "maxwell.h"
 #include "service_functions.h"
 #include "archAPI.h"
-#include "NetCdf/read_file.h"
-#include "NetCdf/NetCdfData.h"
+#include "../src/utils/NetCdf/read_file.h"
+#include "../src/utils/NetCdf/NetCdfData.h"
 
 class PlasmaInitializer {
 private:

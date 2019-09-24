@@ -5,7 +5,7 @@
 #include "../include/mpi_shortcut.h"
 #include "../include/Plasma.h"
 #include "../include/PlasmaTypes.h"
-#include "../include/ConfigParser/Properties.h"
+#include "utils/ConfigParser/Properties.h"
 
 //TODO: gpu cell in the global array at copy from there appears to be not initialized
 using namespace std;
